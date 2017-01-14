@@ -9,6 +9,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.widget.Button;
+
+import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
+import org.eclipse.paho.client.mqttv3.MqttCallback;
+import org.eclipse.paho.client.mqttv3.MqttClient;
+import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
+import org.eclipse.paho.client.mqttv3.MqttException;
+import org.eclipse.paho.client.mqttv3.MqttMessage;
+import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
 
 /**
@@ -19,7 +28,7 @@ import android.view.Window;
  * Use the {@link GarageDetailFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class GarageDetailFragment extends DialogFragment {
+public class GarageDetailFragment extends DialogFragment implements View.OnClickListener,MqttCallback {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -31,6 +40,16 @@ public class GarageDetailFragment extends DialogFragment {
 
     private OnFragmentInteractionListener mListener;
     private View v;
+    private Button btnnRequest;
+
+        /*MQTT Block*/
+
+    String topic        = "GOJEKTOPIC2";
+    //  String content      = "Message from MqttPublishSample";
+    int qos             = 2;
+    String broker       = "tcp://52.59.15.99:1883";
+    String clientId     = "GOJEKREQ";
+    MqttClient sampleClient = null;
 
     public GarageDetailFragment() {
         // Required empty public constructor
@@ -69,6 +88,10 @@ public class GarageDetailFragment extends DialogFragment {
         // Inflate the layout for this fragment
         v= inflater.inflate(R.layout.fragment_garage_detail, container, false);
 
+        btnnRequest=(Button)v.findViewById(R.id.btnRequest);
+
+        btnnRequest.setOnClickListener(this);
+
         getDialog().getWindow().requestFeature(Window.FEATURE_NO_TITLE);
         return v;
     }
@@ -95,6 +118,72 @@ public class GarageDetailFragment extends DialogFragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()){
+            case R.id.btnRequest:
+                sendDataToGarage();
+                break;
+        }
+    }
+
+    private void sendDataToGarage() {
+
+
+        MemoryPersistence persistence = new MemoryPersistence();
+
+        try {
+            sampleClient = new MqttClient(broker, clientId, persistence);
+        } catch (MqttException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            String content="Request Request !!!";
+
+            MqttConnectOptions connOpts = new MqttConnectOptions();
+            connOpts.setCleanSession(true);
+            System.out.println("Connecting to broker: "+broker);
+            sampleClient.connect(connOpts);
+
+            System.out.println("Connected");
+
+            System.out.println("Publishing message: "+content);
+            MqttMessage message = new MqttMessage(content.getBytes());
+            message.setQos(qos);
+            sampleClient.publish(topic, message);
+            System.out.println("Message published");
+
+            sampleClient.disconnect();
+            System.out.println("Disconnected");
+            //System.exit(0);
+
+        } catch(MqttException me) {
+            System.out.println("reason "+me.getReasonCode());
+            System.out.println("msg "+me.getMessage());
+            System.out.println("loc "+me.getLocalizedMessage());
+            System.out.println("cause "+me.getCause());
+            System.out.println("excep "+me);
+            me.printStackTrace();
+        }
+
+    }
+
+    @Override
+    public void connectionLost(Throwable cause) {
+
+    }
+
+    @Override
+    public void messageArrived(String topic, MqttMessage message) throws Exception {
+
+    }
+
+    @Override
+    public void deliveryComplete(IMqttDeliveryToken token) {
+
     }
 
     /**
