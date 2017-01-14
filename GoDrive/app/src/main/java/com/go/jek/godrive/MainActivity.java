@@ -22,6 +22,10 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.firebase.client.DataSnapshot;
+import com.firebase.client.Firebase;
+import com.firebase.client.FirebaseError;
+import com.firebase.client.ValueEventListener;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -59,6 +63,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     Button btnFuel;
     ImageView imgMore;
     ImageView imgInspection;
+    ImageView imgTemp;
+    ImageView imgNoise;
 
     SharedPreferences sharedpreferences;
 
@@ -76,6 +82,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     JSONObject obj;
     List<Garage> garages;
+    List<GarageInfo> garageInfo;
+
+    Sensors sensors_data;
 
     private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 10; // 10 meters
 
@@ -98,6 +107,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         btnFuel= (Button) findViewById(R.id.buttonFuel);
         imgMore= (ImageView) findViewById(R.id.imgMore);
         imgInspection= (ImageView) findViewById(R.id.imgInspection);
+        imgTemp= (ImageView) findViewById(R.id.imgTemp);
+        imgNoise= (ImageView) findViewById(R.id.imgPressure);
 
         btnGarages.setOnClickListener(this);
         btnFuel.setOnClickListener(this);
@@ -123,6 +134,32 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mapView.onResume();
 
 //        new GetGarages().execute();
+
+        Firebase.setAndroidContext(this);
+        Firebase ref=new Firebase(Config.FIREBASE_URL_SENSORS);
+
+        ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                sensors_data= dataSnapshot.getValue(Sensors.class);
+                if(sensors_data.getNoise()>25){
+                    imgNoise.setImageResource(R.drawable.noise_red);
+                }else{
+                    imgNoise.setImageResource(R.drawable.noise);
+                }
+
+                if(sensors_data.getTemperature()>25){
+                    imgTemp.setImageResource(R.drawable.temp_red);
+                }else{
+                    imgTemp.setImageResource(R.drawable.temp);
+                }
+            }
+
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+
+            }
+        });
 
         String restoredText = sharedpreferences.getString("inspection", null);
 
@@ -256,7 +293,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             googleMap.addMarker(new MarkerOptions()
                     .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker))
                     .position(new LatLng(getLatitude(), getLongitude()))
-                    .title("Others"));
+                    .title("Current Location"));
 
 
 
@@ -287,7 +324,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
 
-    public void addGarages(List<Garage> obj){
+    public void addGarages(List<GarageInfo> obj){
 
 //        try {
 //            JSONArray jsonArray=obj.getJSONArray("garages");
@@ -296,6 +333,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 //        } catch (JSONException e) {
 //            e.printStackTrace();
 //        }
+        String status;
 
         googleMap.clear();
 
@@ -307,18 +345,23 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         googleMap.addMarker(new MarkerOptions()
                 .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker))
                 .position(new LatLng(getLatitude(), getLongitude()))
-                .title("Others"));
+                .title("Current Location"));
 
         for(int i=0;i<obj.size();i++){
             googleMap.animateCamera(CameraUpdateFactory.zoomTo(16));
 
+            if(obj.get(i).getStatus().equals("0")){
+                status="available";
+            }else{
+                status="not available";
+            }
 
             googleMap.addMarker(new MarkerOptions()
                     .icon(BitmapDescriptorFactory.fromResource(R.drawable.garage_marker))
                     .position(new LatLng(obj.get(i).getLatitude(), obj.get(i).getLongitude()))
-                    .snippet(obj.get(i).getStatus()+" , "+obj.get(i).getContact_info())
+                    .snippet(status+" , "+obj.get(i).getContactNo())
 
-                    .title(obj.get(i).getGarage_name()));
+                    .title(obj.get(i).getName()));
 
 
 
@@ -542,21 +585,24 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
             JSONArray jsonArray;
             try {
-                obj=new JSONObject(res);
-                jsonArray=obj.getJSONArray("garages");
+               // obj=new JSONObject(res);
+                jsonArray=new JSONArray(res);
+          //      jsonArray=obj.getJSONArray("garages");
 
                 pDialog.dismiss();
                 System.out.print(res);
 
-                garages = new ArrayList<Garage>();
-                garages = Arrays.asList(gson.fromJson(String.valueOf(jsonArray), Garage[].class));
+            //    garages = new ArrayList<Garage>();
+            //   garages = Arrays.asList(gson.fromJson(String.valueOf(jsonArray), Garage[].class));
+
+                    garageInfo = new ArrayList<GarageInfo>();
+                   garageInfo = Arrays.asList(gson.fromJson(String.valueOf(jsonArray), GarageInfo[].class));
                 System.out.print(res);
-              //  res_vStatus=obj.getString("status");
             } catch (JSONException e) {
                 e.printStackTrace();
             }
 
-            addGarages(garages);
+            addGarages(garageInfo);
 
 
 

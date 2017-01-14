@@ -27,6 +27,8 @@ public class MoreActivity extends AppCompatActivity implements CompoundButton.On
 
 
         aSwitch.setOnCheckedChangeListener(this);
+
+        
     }
 
     @Override
