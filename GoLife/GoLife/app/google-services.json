@@ -1,0 +1,73 @@
+{
+  "project_info": {
+    "project_number": "841979950054",
+    "firebase_url": "https://greenwire-2b2ad.firebaseio.com",
+    "project_id": "greenwire-2b2ad",
+    "storage_bucket": "greenwire-2b2ad.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:841979950054:android:c862b7cf52c6167a",
+        "android_client_info": {
+          "package_name": "iot.hack.greenwire"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "841979950054-a61rr247bg01t8vmsj4fjgc9bmv1d8u7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBg3yFPgVhkwsWg6da1Yf9jjzME7sYo-yI"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:841979950054:android:c7474515ddcaab4f",
+        "android_client_info": {
+          "package_name": "com.go.jek.golife"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "841979950054-a61rr247bg01t8vmsj4fjgc9bmv1d8u7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBg3yFPgVhkwsWg6da1Yf9jjzME7sYo-yI"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
