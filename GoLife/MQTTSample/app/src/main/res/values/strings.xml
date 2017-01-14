@@ -1,6 +1,5 @@
 <resources>
-    <string name="app_name">GoLife</string>
+    <string name="app_name">MQTTSample</string>
     <string name="dialog_fire_missiles">Booking Confirmed</string>
     <string name="fire">Yes</string>
-    <string name="cancel">No</string>
 </resources>
