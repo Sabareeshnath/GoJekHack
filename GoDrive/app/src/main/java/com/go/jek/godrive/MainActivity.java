@@ -3,12 +3,16 @@ package com.go.jek.godrive;
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.Camera;
 import android.location.Location;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -20,10 +24,14 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, android.location.LocationListener {
+public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, android.location.LocationListener, View.OnClickListener {
 
     private MapView mapView;
     private GoogleMap googleMap;
+
+    Button btnGarages;
+    Button btnFuel;
+
 
     protected LocationManager locationManager;
     boolean isGPSEnabled = false;
@@ -44,10 +52,20 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        btnGarages= (Button) findViewById(R.id.buttonGarages);
+        btnFuel= (Button) findViewById(R.id.buttonFuel);
+
+        btnGarages.setOnClickListener(this);
+        btnFuel.setOnClickListener(this);
+
+
+
         mapView = (MapView) findViewById(R.id.mapView);
         mapView.onCreate(savedInstanceState);
 
         mapView.getMapAsync(this);
+
+
 
 
     }
@@ -186,29 +204,84 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 
 
-            googleMap.addMarker(new MarkerOptions()
-                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.pin_red))
-                    .position(new LatLng(getLatitude()+0.0013, getLongitude()+0.0003))
-                    .title("Others"));
-
-            googleMap.addMarker(new MarkerOptions()
-                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.pin_red))
-                    .position(new LatLng(getLatitude()+0.1008, getLongitude()+0.009))
-                    .title("Others"));
-
-            googleMap.addMarker(new MarkerOptions()
-                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.pin_red))
-                    .position(new LatLng(getLatitude()+0.0118, getLongitude()+0.0019))
-                    .title("Others"));
-
-            googleMap.addMarker(new MarkerOptions()
-                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.pin_red))
-                    .position(new LatLng(getLatitude()+0.0028, getLongitude()+0.0029))
-                    .title("Others"));
+//            googleMap.addMarker(new MarkerOptions()
+//                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.pin_red))
+//                    .position(new LatLng(getLatitude()+0.0013, getLongitude()+0.0003))
+//                    .title("Others"));
+//
+//            googleMap.addMarker(new MarkerOptions()
+//                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.pin_red))
+//                    .position(new LatLng(getLatitude()+0.1008, getLongitude()+0.009))
+//                    .title("Others"));
+//
+//            googleMap.addMarker(new MarkerOptions()
+//                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.pin_red))
+//                    .position(new LatLng(getLatitude()+0.0118, getLongitude()+0.0019))
+//                    .title("Others"));
+//
+//            googleMap.addMarker(new MarkerOptions()
+//                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.pin_red))
+//                    .position(new LatLng(getLatitude()+0.0028, getLongitude()+0.0029))
+//                    .title("Others"));
 
 
 
         }
+    }
+
+
+    public void addGarages(){
+
+        new GetGarages().execute();
+
+        googleMap.animateCamera(CameraUpdateFactory.zoomTo(12));
+
+                    googleMap.addMarker(new MarkerOptions()
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.garage_marker))
+                    .position(new LatLng(getLatitude()+0.0013, getLongitude()+0.0003))
+                    .title("Others"));
+
+            googleMap.addMarker(new MarkerOptions()
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.garage_marker))
+                    .position(new LatLng(getLatitude()+0.1008, getLongitude()+0.009))
+                    .title("Others"));
+
+            googleMap.addMarker(new MarkerOptions()
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.garage_marker))
+                    .position(new LatLng(getLatitude()+0.0118, getLongitude()+0.0019))
+                    .title("Others"));
+
+            googleMap.addMarker(new MarkerOptions()
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.garage_marker))
+                    .position(new LatLng(getLatitude()+0.0028, getLongitude()+0.0029))
+                    .title("Others"));
+
+    }
+
+    public void showFuelStations(){
+
+        googleMap.animateCamera(CameraUpdateFactory.zoomTo(12));
+
+        googleMap.addMarker(new MarkerOptions()
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.fuel_marker))
+                .position(new LatLng(getLatitude()+0.0013, getLongitude()+0.0003))
+                .title("Others"));
+
+        googleMap.addMarker(new MarkerOptions()
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.fuel_marker))
+                .position(new LatLng(getLatitude()+0.1008, getLongitude()+0.009))
+                .title("Others"));
+
+        googleMap.addMarker(new MarkerOptions()
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.fuel_marker))
+                .position(new LatLng(getLatitude()+0.0118, getLongitude()+0.0019))
+                .title("Others"));
+
+        googleMap.addMarker(new MarkerOptions()
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.fuel_marker))
+                .position(new LatLng(getLatitude()+0.0028, getLongitude()+0.0029))
+                .title("Others"));
+
     }
 
     @Override
@@ -229,5 +302,39 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onProviderDisabled(String s) {
 
+    }
+
+    @Override
+    public void onClick(View view) {
+
+        switch (view.getId()){
+            case R.id.buttonGarages:
+                addGarages();
+                break;
+
+            case R.id.buttonFuel:
+                showFuelStations();
+                break;
+        }
+
+    }
+
+    private class GetGarages extends AsyncTask<String,String,String> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+        }
+
+        @Override
+        protected String doInBackground(String... strings) {
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+        }
     }
 }

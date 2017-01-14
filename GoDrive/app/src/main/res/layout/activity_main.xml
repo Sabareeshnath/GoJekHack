@@ -19,12 +19,13 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="50dp"
+        android:id="@+id/linear"
         android:layout_below="@id/mapView"
         android:orientation="horizontal"
         android:weightSum="2">
 
         <Button
-            android:id="@+id/button"
+            android:id="@+id/buttonGarages"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
@@ -39,7 +40,7 @@
             android:orientation="vertical"></LinearLayout>
 
         <Button
-            android:id="@+id/button2"
+            android:id="@+id/buttonFuel"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
@@ -47,5 +48,29 @@
             android:text="Show fuel stations"
             android:textColor="#FFFFFF" />
     </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_below="@id/linear"
+        android:orientation="horizontal"
+        android:weightSum="2">
+
+        <ImageView
+            android:id="@+id/imgJekLogo"
+            android:layout_marginTop="5dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:src="@drawable/gojek"
+             />
+
+
+
+
+        </LinearLayout>
+
+
+
 
 </RelativeLayout>
