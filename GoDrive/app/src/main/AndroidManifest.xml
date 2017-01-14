@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.go.jek.godrive" >
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.go.jek.godrive">
+
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:allowBackup="true"
@@ -15,6 +21,17 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <meta-data
+            android:name="com.google.android.maps.v2.API_KEY"
+            android:value="AIzaSyDGK67MyTz2oMaWNxLUQdgLKHFe-cGYRbM" />
+
+        <meta-data
+            tools:replace="android:value"
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
     </application>
+
+
 
 </manifest>
