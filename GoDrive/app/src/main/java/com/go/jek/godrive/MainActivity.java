@@ -1,18 +1,26 @@
 package com.go.jek.godrive;
 
 import android.Manifest;
+import android.app.FragmentManager;
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Camera;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.AsyncTask;
+import android.os.SystemClock;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.FragmentTabHost;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -22,16 +30,37 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
-public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, android.location.LocationListener, View.OnClickListener {
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, android.location.LocationListener, View.OnClickListener, GoogleMap.OnMarkerClickListener {
 
     private MapView mapView;
     private GoogleMap googleMap;
 
     Button btnGarages;
     Button btnFuel;
+    ImageView imgMore;
+    ImageView imgInspection;
 
+    SharedPreferences sharedpreferences;
 
     protected LocationManager locationManager;
     boolean isGPSEnabled = false;
@@ -42,21 +71,37 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     double latitude; // latitude
     double longitude; // longitude
 
+
+    Gson gson;
+
+    JSONObject obj;
+    List<Garage> garages;
+
     private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 10; // 10 meters
 
 
     private static final long MIN_TIME_BW_UPDATES = 1000 * 60 * 1; // 1 minute
+    private ProgressDialog pDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        gsonBuilder.setDateFormat("M/d/yy hh:mm a");
+        gson = gsonBuilder.create();
+
+        sharedpreferences = getSharedPreferences("prefs", Context.MODE_PRIVATE);
+
         btnGarages= (Button) findViewById(R.id.buttonGarages);
         btnFuel= (Button) findViewById(R.id.buttonFuel);
+        imgMore= (ImageView) findViewById(R.id.imgMore);
+        imgInspection= (ImageView) findViewById(R.id.imgInspection);
 
         btnGarages.setOnClickListener(this);
         btnFuel.setOnClickListener(this);
+        imgMore.setOnClickListener(this);
 
 
 
@@ -76,6 +121,18 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         getLocation();
         mapView.onResume();
+
+//        new GetGarages().execute();
+
+        String restoredText = sharedpreferences.getString("inspection", null);
+
+        if(restoredText!=null){
+            if(restoredText.equals("on")){
+                imgInspection.setImageResource(R.drawable.inspection_red);
+            }else{
+                imgInspection.setImageResource(R.drawable.inspection);
+            }
+        }
 
     }
 
@@ -230,57 +287,123 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
 
-    public void addGarages(){
+    public void addGarages(List<Garage> obj){
 
-        new GetGarages().execute();
+//        try {
+//            JSONArray jsonArray=obj.getJSONArray("garages");
+//            System.out.print("");
+//            Toast.makeText(MainActivity.this, ""+jsonArray, Toast.LENGTH_SHORT).show();
+//        } catch (JSONException e) {
+//            e.printStackTrace();
+//        }
 
-        googleMap.animateCamera(CameraUpdateFactory.zoomTo(12));
+        googleMap.clear();
 
-                    googleMap.addMarker(new MarkerOptions()
-                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.garage_marker))
-                    .position(new LatLng(getLatitude()+0.0013, getLongitude()+0.0003))
-                    .title("Others"));
+
+
+
+
+
+        googleMap.addMarker(new MarkerOptions()
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker))
+                .position(new LatLng(getLatitude(), getLongitude()))
+                .title("Others"));
+
+        for(int i=0;i<obj.size();i++){
+            googleMap.animateCamera(CameraUpdateFactory.zoomTo(16));
+
 
             googleMap.addMarker(new MarkerOptions()
                     .icon(BitmapDescriptorFactory.fromResource(R.drawable.garage_marker))
-                    .position(new LatLng(getLatitude()+0.1008, getLongitude()+0.009))
-                    .title("Others"));
+                    .position(new LatLng(obj.get(i).getLatitude(), obj.get(i).getLongitude()))
+                    .snippet(obj.get(i).getStatus()+" , "+obj.get(i).getContact_info())
 
-            googleMap.addMarker(new MarkerOptions()
-                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.garage_marker))
-                    .position(new LatLng(getLatitude()+0.0118, getLongitude()+0.0019))
-                    .title("Others"));
+                    .title(obj.get(i).getGarage_name()));
 
-            googleMap.addMarker(new MarkerOptions()
-                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.garage_marker))
-                    .position(new LatLng(getLatitude()+0.0028, getLongitude()+0.0029))
-                    .title("Others"));
+
+
+
+
+
+
+        }
+
+        googleMap.setOnMarkerClickListener(this);
+
+//
+//            googleMap.addMarker(new MarkerOptions()
+//                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.garage_marker))
+//                    .position(new LatLng(getLatitude()+0.1008, getLongitude()+0.009))
+//                    .title("Others"));
+//
+//            googleMap.addMarker(new MarkerOptions()
+//                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.garage_marker))
+//                    .position(new LatLng(getLatitude()+0.0118, getLongitude()+0.0019))
+//                    .title("Others"));
+//
+//            googleMap.addMarker(new MarkerOptions()
+//                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.garage_marker))
+//                    .position(new LatLng(getLatitude()+0.0028, getLongitude()+0.0029))
+//                    .title("Others"));
 
     }
 
-    public void showFuelStations(){
+    public void showFuelStations(List<Garage> obj){
 
-        googleMap.animateCamera(CameraUpdateFactory.zoomTo(12));
+        googleMap.clear();
 
-        googleMap.addMarker(new MarkerOptions()
-                .icon(BitmapDescriptorFactory.fromResource(R.drawable.fuel_marker))
-                .position(new LatLng(getLatitude()+0.0013, getLongitude()+0.0003))
-                .title("Others"));
 
-        googleMap.addMarker(new MarkerOptions()
-                .icon(BitmapDescriptorFactory.fromResource(R.drawable.fuel_marker))
-                .position(new LatLng(getLatitude()+0.1008, getLongitude()+0.009))
-                .title("Others"));
+
+
 
         googleMap.addMarker(new MarkerOptions()
-                .icon(BitmapDescriptorFactory.fromResource(R.drawable.fuel_marker))
-                .position(new LatLng(getLatitude()+0.0118, getLongitude()+0.0019))
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker))
+                .position(new LatLng(getLatitude(), getLongitude()))
                 .title("Others"));
 
-        googleMap.addMarker(new MarkerOptions()
-                .icon(BitmapDescriptorFactory.fromResource(R.drawable.fuel_marker))
-                .position(new LatLng(getLatitude()+0.0028, getLongitude()+0.0029))
-                .title("Others"));
+        for(int i=0;i<obj.size();i++){
+            googleMap.animateCamera(CameraUpdateFactory.zoomTo(16));
+
+
+            googleMap.addMarker(new MarkerOptions()
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.fuel_marker))
+                    .position(new LatLng(obj.get(i).getLatitude(), obj.get(i).getLongitude()))
+//                    .snippet(obj.get(i).getStatus()+" , "+obj.get(i).getContact_info())
+
+//                    .title(obj.get(i).getGarage_name())
+            );
+
+
+
+
+
+
+
+        }
+
+        googleMap.setOnMarkerClickListener(this);
+
+//        googleMap.animateCamera(CameraUpdateFactory.zoomTo(12));
+//
+//        googleMap.addMarker(new MarkerOptions()
+//                .icon(BitmapDescriptorFactory.fromResource(R.drawable.fuel_marker))
+//                .position(new LatLng(getLatitude()+0.0013, getLongitude()+0.0003))
+//                .title("Others"));
+//
+//        googleMap.addMarker(new MarkerOptions()
+//                .icon(BitmapDescriptorFactory.fromResource(R.drawable.fuel_marker))
+//                .position(new LatLng(getLatitude()+0.1008, getLongitude()+0.009))
+//                .title("Others"));
+//
+//        googleMap.addMarker(new MarkerOptions()
+//                .icon(BitmapDescriptorFactory.fromResource(R.drawable.fuel_marker))
+//                .position(new LatLng(getLatitude()+0.0118, getLongitude()+0.0019))
+//                .title("Others"));
+//
+//        googleMap.addMarker(new MarkerOptions()
+//                .icon(BitmapDescriptorFactory.fromResource(R.drawable.fuel_marker))
+//                .position(new LatLng(getLatitude()+0.0028, getLongitude()+0.0029))
+//                .title("Others"));
 
     }
 
@@ -309,32 +432,238 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         switch (view.getId()){
             case R.id.buttonGarages:
-                addGarages();
+
+                System.out.print("");
+                new GetGarages().execute();
+
+
                 break;
 
             case R.id.buttonFuel:
-                showFuelStations();
+                new GetFuel().execute();
+
+                break;
+
+            case R.id.imgMore:
+                Intent intent = new Intent(MainActivity.this,MoreActivity.class);
+                startActivity(intent);
                 break;
         }
 
+    }
+
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+        GarageDetailFragment garageDetailFragment=new GarageDetailFragment();
+        FragmentManager fragmentManager=getFragmentManager();
+        garageDetailFragment.show(fragmentManager,"");
+
+        return false;
     }
 
     private class GetGarages extends AsyncTask<String,String,String> {
 
         @Override
         protected void onPreExecute() {
+
             super.onPreExecute();
+
+            pDialog = new ProgressDialog(MainActivity.this);
+            //  pDialog.setTitle("Loading");
+            pDialog.setMessage(" Loading..");
+            pDialog.setCancelable(false);
+            pDialog.show();
 
         }
 
         @Override
         protected String doInBackground(String... strings) {
-            return null;
+            Log.e("in bg", "");
+            String url=Config.FIREBASE_URL_GETGARAGE;
+
+
+            HttpURLConnection con=null;
+            URL obj = null;
+
+            try {
+                obj = new URL(url);
+                con = (HttpURLConnection) obj.openConnection();
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            try {
+                con.setRequestMethod("GET");
+            } catch (ProtocolException e) {
+                e.printStackTrace();
+            }
+
+            int responseCode = 0;
+            try {
+                responseCode = con.getResponseCode();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+
+            BufferedReader in = null;
+            StringBuffer response=null;
+            try {
+                in = new BufferedReader(
+                        new InputStreamReader(con.getInputStream()));
+                String inputLine;
+                response = new StringBuffer();
+
+                while ((inputLine = in.readLine()) != null) {
+                    response.append(inputLine);
+                }
+                in.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            //  Log.e("Response json",":"+response);
+
+            String response_data=response.toString();
+            //print result
+            //  Log.e("Resp Res",":"+response.toString());
+
+            return response_data;
+
         }
 
         @Override
-        protected void onPostExecute(String s) {
-            super.onPostExecute(s);
+        protected void onPostExecute(String res) {
+            super.onPostExecute(res);
+
+
+
+            JSONArray jsonArray;
+            try {
+                obj=new JSONObject(res);
+                jsonArray=obj.getJSONArray("garages");
+
+                pDialog.dismiss();
+                System.out.print(res);
+
+                garages = new ArrayList<Garage>();
+                garages = Arrays.asList(gson.fromJson(String.valueOf(jsonArray), Garage[].class));
+                System.out.print(res);
+              //  res_vStatus=obj.getString("status");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            addGarages(garages);
+
+
+
+
+        }
+    }
+
+    private class GetFuel extends AsyncTask<String,String,String> {
+
+        @Override
+        protected void onPreExecute() {
+
+            super.onPreExecute();
+
+            pDialog = new ProgressDialog(MainActivity.this);
+            //  pDialog.setTitle("Loading");
+            pDialog.setMessage("Loading..");
+            pDialog.setCancelable(false);
+            pDialog.show();
+
+        }
+
+        @Override
+        protected String doInBackground(String... strings) {
+            Log.e("in bg", "");
+            String url=Config.FIREBASE_URL_GETFUEL;
+
+
+            HttpURLConnection con=null;
+            URL obj = null;
+
+            try {
+                obj = new URL(url);
+                con = (HttpURLConnection) obj.openConnection();
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            try {
+                con.setRequestMethod("GET");
+            } catch (ProtocolException e) {
+                e.printStackTrace();
+            }
+
+            int responseCode = 0;
+            try {
+                responseCode = con.getResponseCode();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+
+            BufferedReader in = null;
+            StringBuffer response=null;
+            try {
+                in = new BufferedReader(
+                        new InputStreamReader(con.getInputStream()));
+                String inputLine;
+                response = new StringBuffer();
+
+                while ((inputLine = in.readLine()) != null) {
+                    response.append(inputLine);
+                }
+                in.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            //  Log.e("Response json",":"+response);
+
+            String response_data=response.toString();
+            //print result
+            //  Log.e("Resp Res",":"+response.toString());
+
+            return response_data;
+
+        }
+
+        @Override
+        protected void onPostExecute(String res) {
+            super.onPostExecute(res);
+
+
+
+            JSONArray jsonArray;
+            try {
+                obj=new JSONObject(res);
+                jsonArray=obj.getJSONArray("garages");
+
+                pDialog.dismiss();
+                System.out.print(res);
+
+                garages = new ArrayList<Garage>();
+                garages = Arrays.asList(gson.fromJson(String.valueOf(jsonArray), Garage[].class));
+                System.out.print(res);
+                //  res_vStatus=obj.getString("status");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            showFuelStations(garages);
+
+
+
+
         }
     }
 }

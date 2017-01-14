@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_more"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.go.jek.godrive.MoreActivity">
+
+
+    <!--<ToggleButton-->
+        <!--android:text="ToggleButton"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_marginTop="18dp"-->
+        <!--android:id="@+id/toggleInspection"-->
+    <!--android:background="@color/colorJek"-->
+        <!--android:layout_alignParentTop="true"-->
+        <!--android:layout_alignParentRight="true"-->
+        <!--android:layout_alignParentEnd="true"-->
+        <!--android:layout_marginRight="24dp"-->
+        <!--android:layout_marginEnd="24dp" />-->
+
+    <Switch
+        android:text=""
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:id="@+id/switch1"
+        android:layout_marginRight="21dp"
+        android:layout_marginEnd="21dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+
+    <TextView
+        android:text="Inspection"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="36dp"
+        android:layout_marginStart="36dp"
+        android:textSize="20sp"
+        android:id="@+id/textView"
+        android:layout_alignTop="@id/switch1"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:textSize="20sp"
+        android:id="@+id/editName"
+        android:text="Ojek"
+        android:layout_marginTop="88dp"
+        android:layout_below="@+id/switch1"
+        android:layout_alignLeft="@+id/editAddress"
+        android:layout_alignStart="@+id/editAddress" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:textSize="20sp"
+        android:layout_height="40dp"
+        android:id="@+id/editAddress"
+        android:text="HAL airport road"
+        android:layout_below="@+id/editName"
+        android:layout_alignLeft="@+id/textView"
+        android:layout_alignStart="@+id/textView" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Driver information"
+        android:textSize="15sp"
+        android:layout_below="@+id/switch1"
+        android:layout_alignLeft="@+id/textView"
+        android:layout_alignStart="@+id/textView"
+        android:layout_marginTop="50dp" />
+
+
+</RelativeLayout>
