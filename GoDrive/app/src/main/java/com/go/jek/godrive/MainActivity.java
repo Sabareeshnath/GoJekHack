@@ -11,6 +11,8 @@ import android.graphics.Camera;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.ResultReceiver;
 import android.os.SystemClock;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentTabHost;
@@ -36,9 +38,17 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
+import org.eclipse.paho.client.mqttv3.MqttCallback;
+import org.eclipse.paho.client.mqttv3.MqttClient;
+import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
+import org.eclipse.paho.client.mqttv3.MqttException;
+import org.eclipse.paho.client.mqttv3.MqttMessage;
+import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -86,11 +96,16 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     Sensors sensors_data;
 
+    private FirebaseAnalytics firebaseAnalytics;
+
+
+
     private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 10; // 10 meters
 
 
     private static final long MIN_TIME_BW_UPDATES = 1000 * 60 * 1; // 1 minute
     private ProgressDialog pDialog;
+    private String extremeAreas;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,6 +115,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.setDateFormat("M/d/yy hh:mm a");
         gson = gsonBuilder.create();
+
+        firebaseAnalytics=FirebaseAnalytics.getInstance(this);
 
         sharedpreferences = getSharedPreferences("prefs", Context.MODE_PRIVATE);
 
@@ -123,7 +140,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 
 
+
+
     }
+
+
+
+
+
 
     @Override
     protected void onResume() {
@@ -131,6 +155,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         getLocation();
         mapView.onResume();
+
+
 
 //        new GetGarages().execute();
 
@@ -502,6 +528,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         return false;
     }
+
+
 
     private class GetGarages extends AsyncTask<String,String,String> {
 

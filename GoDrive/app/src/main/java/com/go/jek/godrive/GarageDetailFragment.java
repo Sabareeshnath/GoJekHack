@@ -1,6 +1,8 @@
 package com.go.jek.godrive;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.DialogFragment;
@@ -125,8 +127,35 @@ public class GarageDetailFragment extends DialogFragment implements View.OnClick
         switch (view.getId()){
             case R.id.btnRequest:
                 sendDataToGarage();
+                showPopup();
+                getDialog().dismiss();
                 break;
         }
+    }
+
+    private void showPopup() {
+        AlertDialog alertDialog = new AlertDialog.Builder(
+                getActivity()).create();
+
+        // Setting Dialog Title
+        alertDialog.setTitle("Request Sent");
+
+        // Setting Dialog Message
+        alertDialog.setMessage("Request has been successfully sent, technician may call you soon");
+
+        // Setting Icon to Dialog
+       // alertDialog.setIcon(R.drawable.tick);
+
+        // Setting OK Button
+        alertDialog.setButton("OK", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                // Write your code here to execute after dialog closed
+                //Toast.makeText(getApplicationContext(), "You clicked on OK", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        // Showing Alert Message
+        alertDialog.show();
     }
 
     private void sendDataToGarage() {

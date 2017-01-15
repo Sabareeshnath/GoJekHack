@@ -25,6 +25,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
+        android:shadowColor="@color/colorJek"
         android:id="@+id/switch1"
         android:layout_marginRight="21dp"
         android:layout_marginEnd="21dp"
@@ -44,6 +45,7 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
 
+
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="40dp"
@@ -56,24 +58,62 @@
         android:layout_alignStart="@+id/editAddress" />
 
     <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Driver information"
+        android:background="@color/colorJek"
+        android:padding="5dp"
+        android:textSize="15sp"
+        android:id="@+id/txt"
+        android:layout_below="@id/switch1"
+        android:layout_alignLeft="@+id/textView"
+        android:layout_alignStart="@+id/textView"
+        android:layout_marginTop="50dp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Extreme booking zone"
+        android:background="@color/colorJek"
+        android:padding="5dp"
+        android:textSize="15sp"
+        android:id="@+id/title2"
+        android:layout_marginTop="43dp"
+        android:layout_below="@+id/editAddress"
+        android:layout_alignLeft="@+id/editAddress"
+        android:layout_alignStart="@+id/editAddress" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:textSize="20sp"
+        android:layout_height="wrap_content"
+        android:id="@+id/extremeZoneName"
+        android:layout_marginTop="10dp"
+        android:text=""
+        android:padding="5dp"
+        android:layout_below="@+id/title2"
+        android:layout_alignLeft="@+id/textView"
+        android:layout_alignStart="@+id/textView" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:textSize="20sp"
+        android:layout_height="40dp"
+        android:id="@+id/editRating"
+        android:text="Rating : 4/5"
+        android:layout_below="@+id/editAddress"
+        android:layout_alignLeft="@+id/editAddress"
+        android:layout_alignStart="@+id/editAddress" />
+
+    <TextView
         android:layout_width="wrap_content"
         android:textSize="20sp"
         android:layout_height="40dp"
         android:id="@+id/editAddress"
         android:text="HAL airport road"
         android:layout_below="@+id/editName"
-        android:layout_alignLeft="@+id/textView"
-        android:layout_alignStart="@+id/textView" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Driver information"
-        android:textSize="15sp"
-        android:layout_below="@+id/switch1"
-        android:layout_alignLeft="@+id/textView"
-        android:layout_alignStart="@+id/textView"
-        android:layout_marginTop="50dp" />
+        android:layout_alignLeft="@+id/txt"
+        android:layout_alignStart="@+id/txt" />
 
 
 </RelativeLayout>
